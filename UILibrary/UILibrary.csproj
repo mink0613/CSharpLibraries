@@ -52,6 +52,10 @@
     <Compile Include="Buttons\ColoredButton.cs" />
     <Compile Include="Buttons\ImageButton.cs" />
     <Compile Include="Buttons\MenuColorButton.cs" />
+    <Compile Include="Calendars\CalendarView.xaml.cs">
+      <DependentUpon>CalendarView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Calendars\CalendarViewModel.cs" />
     <Compile Include="Converters\BoolToBackgroundConverter.cs" />
     <Compile Include="Converters\BoolToOppositeConverter.cs" />
     <Compile Include="Converters\BoolToOppositeVisibilityConverter.cs" />
@@ -65,6 +69,10 @@
     <Compile Include="TextBoxes\DigitOnlyTextBox.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Calendars\CalendarView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MessageBoxes\TopmostMessageBox.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
