@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CommonLibrary
 {
-    public class Excel
+    public class ExcelWrapper
     {
         private static Application _excelApplication;
 
