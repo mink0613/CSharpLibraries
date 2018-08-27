@@ -1,6 +1,8 @@
 ﻿using Microsoft.Office.Interop.Excel;
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace CommonLibrary
 {
@@ -18,6 +20,52 @@ namespace CommonLibrary
             int id;
             GetWindowThreadProcessId(excelApp.Hwnd, out id);
             Process.GetProcessById(id).Kill();
+        }
+
+        private static int GetRowNumber(string address)
+        {
+            if (address == null || address == string.Empty)
+            {
+                return -1;
+            }
+
+            string[] items = address.Split('$');
+            if (items == null || items.Length != 2)
+            {
+                return -1;
+            }
+
+            int number = -1;
+            int.TryParse(items[1], out number);
+            return number;
+        }
+
+        private static string GetColumnString(string address)
+        {
+            if (address == null || address == string.Empty)
+            {
+                return string.Empty;
+            }
+
+            string[] items = address.Split('$');
+            if (items == null || items.Length != 2)
+            {
+                return string.Empty;
+            }
+
+            return items[0];
+        }
+
+        private static int GetColumnNumber(string address)
+        {
+            string columnString = GetColumnString(address);
+            if (columnString == string.Empty)
+            {
+                return -1;
+            }
+
+            byte[] convertedByte = Encoding.ASCII.GetBytes(columnString);
+            return BitConverter.ToInt32(convertedByte, 0) - (65/*ASCII Code Number of A*/ + 1/*Column A should be column number of 1*/);
         }
 
         public static Workbook Open(string fileName)
@@ -95,6 +143,61 @@ namespace CommonLibrary
             }
 
             return sheet.Cells[row, column];
+        }
+
+        public static Range FindRowByCellContent(Worksheet sheet, string content)
+        {
+            if (sheet == null)
+            {
+                return null;
+            }
+
+            var matched = sheet.Cells.Find(content, LookAt: XlLookAt.xlPart) as Range;
+            string address = matched.Address;
+            int rowNumber = GetRowNumber(address);
+            if (rowNumber == -1)
+            {
+                return null;
+            }
+
+            return sheet.Rows[rowNumber];
+        }
+
+        public static Range FindColumnByCellContent(Worksheet sheet, string content)
+        {
+            if (sheet == null)
+            {
+                return null;
+            }
+
+            var matched = sheet.Cells.Find(content, LookAt: XlLookAt.xlPart) as Range;
+            string address = matched.Address;
+            int columnNumber = GetColumnNumber(address);
+            if (columnNumber == -1)
+            {
+                return null;
+            }
+
+            return sheet.Columns[columnNumber];
+        }
+
+        public static Range FindCellByCellContent(Worksheet sheet, string content)
+        {
+            if (sheet == null)
+            {
+                return null;
+            }
+
+            var matched = sheet.Cells.Find(content, LookAt: XlLookAt.xlPart) as Range;
+            string address = matched.Address;
+            int rowNumber = GetRowNumber(address);
+            int columnNumber = GetColumnNumber(address);
+            if (rowNumber == -1 || columnNumber == -1)
+            {
+                return null;
+            }
+
+            return sheet.Cells[rowNumber, columnNumber];
         }
     }
 }
