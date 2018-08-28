@@ -27,6 +27,9 @@ namespace CommonLibrary
         
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern IntPtr FindWindow(string strClassName, string strWindowName);
+
+        [DllImport("user32.dll")]
+        private static extern int GetWindowThreadProcessId(int hWnd, out int lpdwProcessId);
         #endregion
 
         #region Constants
@@ -91,6 +94,11 @@ namespace CommonLibrary
 
             IntPtr result = SendMessage(handle, WM_COPYDATA, IntPtr.Zero, ref data);
             return true;
+        }
+
+        public static void GetWindowHandleId(int hWnd, out int lpdwProcessId)
+        {
+            GetWindowThreadProcessId(hWnd, out lpdwProcessId);
         }
         #endregion
     }
