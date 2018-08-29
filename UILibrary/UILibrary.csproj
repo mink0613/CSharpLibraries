@@ -62,6 +62,7 @@
     <Compile Include="Converters\BoolToOppositeVisibilityConverter.cs" />
     <Compile Include="Converters\BoolToStringConverter.cs" />
     <Compile Include="Converters\DateTimeToStringConverter.cs" />
+    <Compile Include="Converters\MultipleBoolsToBoolConverter.cs" />
     <Compile Include="Converters\WidthConverter.cs" />
     <Compile Include="MessageBoxes\TopmostMessageBox.xaml.cs">
       <DependentUpon>TopmostMessageBox.xaml</DependentUpon>
