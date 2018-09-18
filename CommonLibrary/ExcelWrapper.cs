@@ -84,7 +84,7 @@ namespace CommonLibrary
             }
 
             _excelApplication = new Application();
-            _excel = _excelApplication.Workbooks.Open(fileName);
+            _excel = _excelApplication.Workbooks.Open(fileName, ReadOnly: true);
             if (_excel == null)
             {
                 Close();
@@ -107,11 +107,13 @@ namespace CommonLibrary
                 KillExcelProcess(_excelApplication);
             }
 
-            Marshal.FinalReleaseComObject(_excel);
-            Marshal.FinalReleaseComObject(_excelApplication);
+            Marshal.ReleaseComObject(_excel);
+            Marshal.ReleaseComObject(_excelApplication);
 
             _excel = null;
             _excelApplication = null;
+
+            GC.Collect();
         }
 
         public static int GetWorksheetCount(Workbook workBook)
