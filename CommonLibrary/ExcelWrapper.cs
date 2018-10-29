@@ -63,7 +63,7 @@ namespace CommonLibrary
 
             byte[] convertedByte = Encoding.ASCII.GetBytes(columnString);
             int length = convertedByte.Length;
-            return convertedByte[0] - (65/*ASCII Code Number of A*/ - 1/*Column A should be column number of 1*/) + (26 * (length - 1));
+            return convertedByte[length - 1] - (65/*ASCII Code Number of A*/ - 1/*Column A should be column number of 1*/) + (26 * (length - 1));
         }
 
         private static Range Find(Worksheet sheet, string content, XlLookAt match)
