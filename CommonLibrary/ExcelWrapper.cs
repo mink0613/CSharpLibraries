@@ -214,9 +214,9 @@ namespace CommonLibrary
             }
 
             int column = -1;
-            for (int row = 1; row < 5; row++)
+            for (int row = 1; row < 15; row++)
             {
-                for (int col = 1; col < 5; col++)
+                for (int col = 1; col < 4; col++)
                 {
                     Range cell = sheet.Cells[row, col];
                     if (cell != null && cell.Value != null)
