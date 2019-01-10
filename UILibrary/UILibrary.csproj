@@ -71,6 +71,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextBoxes\DigitOnlyTextBox.cs" />
+    <Compile Include="TextBoxes\WatermarkTextBox.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Calendars\CalendarView.xaml">
