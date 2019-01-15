@@ -68,8 +68,11 @@ namespace UILibrary.TextBoxes
 
         private void WatermarkTextBox_Initialized(object sender, EventArgs e)
         {
-            this.Text = Watermark;
-            this.Foreground = Brushes.Gray;
+            if (this.Text.Length == 0)
+            {
+                this.Text = Watermark;
+                this.Foreground = Brushes.Gray;
+            }
         }
     }
 }
