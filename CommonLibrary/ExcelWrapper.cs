@@ -1,5 +1,6 @@
 ﻿using Microsoft.Office.Interop.Excel;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -393,6 +394,25 @@ namespace CommonLibrary
             }
 
             return sheet.Cells[rowNumber, columnNumber];
+        }
+
+        public static List<string> GetSheetNameList(Workbook excel, int startIndex = 1)
+        {
+            int totalSheets = GetWorksheetCount(excel);
+
+            List<string> poList = new List<string>();
+            for (int sheetNumber = startIndex; sheetNumber <= totalSheets; sheetNumber++)
+            {
+                Worksheet workSheet = GetWorksheet(excel, sheetNumber); // Get a sheet from Opened Excel
+                if (workSheet.Visible == XlSheetVisibility.xlSheetHidden)
+                {
+                    continue;
+                }
+
+                poList.Add(workSheet.Name);
+            }
+
+            return poList;
         }
     }
 }
