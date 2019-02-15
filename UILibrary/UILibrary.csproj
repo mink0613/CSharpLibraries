@@ -58,6 +58,7 @@
     </Compile>
     <Compile Include="Calendars\CalendarViewModel.cs" />
     <Compile Include="Common\CommonHelper.cs" />
+    <Compile Include="Common\TextBoxCaretIndexBinder.cs" />
     <Compile Include="Converters\BoolToBackgroundConverter.cs" />
     <Compile Include="Converters\BoolToOppositeConverter.cs" />
     <Compile Include="Converters\BoolToOppositeVisibilityConverter.cs" />
