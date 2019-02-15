@@ -52,6 +52,7 @@
     <Compile Include="Email.cs" />
     <Compile Include="Encryption.cs" />
     <Compile Include="ExcelWrapper.cs" />
+    <Compile Include="Http.cs" />
     <Compile Include="Win32API.cs" />
     <Compile Include="WindowsRegistry.cs" />
     <Compile Include="UID.cs" />
