@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -12,9 +13,25 @@ namespace CommonLibrary
     {
         public enum FileMode
         {
-            Read = 0,
+            Read,
             Write,
             Create
+        }
+
+        public enum Alignment
+        {
+            Left,
+            Center,
+            Right,
+            Top,
+            Bottom
+        }
+
+        public enum CellFormat
+        {
+            String,
+            Number,
+            Percentage
         }
 
         private static Application _excelApplication;
@@ -24,6 +41,8 @@ namespace CommonLibrary
         private static Worksheet _currentWorksheet;
 
         private static string _currentFileName;
+
+        private static FileMode _currentMode = FileMode.Read;
 
         private static void KillExcelProcess(Application excelApp)
         {
@@ -98,35 +117,47 @@ namespace CommonLibrary
 
             _excelApplication = new Application();
 
-            switch (mode)
+            try
             {
-                case FileMode.Read:
+                switch (mode)
+                {
+                    case FileMode.Read:
 
-                    _excel = _excelApplication.Workbooks.Open(fileName, ReadOnly: true);
+                        _excel = _excelApplication.Workbooks.Open(fileName, ReadOnly: true);
+                        _currentMode = mode;
 
-                    break;
-                case FileMode.Write:
+                        break;
+                    case FileMode.Write:
 
-                    _excel = _excelApplication.Workbooks.Open(fileName, ReadOnly: false, IgnoreReadOnlyRecommended: true, Editable: true);
-                    if (_excel == null)
-                    {
+                        if (File.Exists(fileName))
+                        {
+                            _excel = _excelApplication.Workbooks.Open(fileName, ReadOnly: false, IgnoreReadOnlyRecommended: true, Editable: true);
+                            _currentMode = mode;
+                        }
+                        else
+                        {
+                            _excel = _excelApplication.Workbooks.Add(XlWBATemplate.xlWBATWorksheet);
+                            _currentMode = FileMode.Create;
+                        }
+
+                        break;
+                    case FileMode.Create:
+
                         _excel = _excelApplication.Workbooks.Add(XlWBATemplate.xlWBATWorksheet);
-                    }
-                    
-                    break;
-                case FileMode.Create:
+                        _currentMode = mode;
 
-                    _excel = _excelApplication.Workbooks.Add(XlWBATemplate.xlWBATWorksheet);
+                        break;
+                }
 
-                    break;
+                _currentFileName = fileName;
             }
-            
-            if (_excel == null)
+            catch (Exception e)
             {
-                Close();
+                System.Windows.Forms.MessageBox.Show(e.Message);
+                _excel = null;
+                _currentFileName = null;
+                _currentMode = FileMode.Read;
             }
-
-            _currentFileName = fileName;
 
             return _excel;
         }
@@ -139,34 +170,55 @@ namespace CommonLibrary
             }
 
             _excelApplication.DisplayAlerts = false;
-            _excel.Save();
+
+            if (_currentMode == FileMode.Read)
+            {
+                return false;
+            }
+            else if (_currentMode == FileMode.Write)
+            {
+                _excel.Save();
+            }
+            else if (_currentMode == FileMode.Create)
+            {
+                _excel.SaveAs(_currentFileName);
+            }
+            
             return true;
         }
 
         public static void Close()
         {
-            if (_excel != null)
+            try
             {
-                _excel.Close(0);
-            }
+                if (_excel != null)
+                {
+                    _excel.Close(0);
+                }
 
-            if (_excelApplication != null)
+                if (_excelApplication != null)
+                {
+                    _excelApplication.Workbooks.Close();
+                    _excelApplication.Quit();
+                    KillExcelProcess(_excelApplication);
+                }
+
+                Marshal.ReleaseComObject(_currentWorksheet);
+                Marshal.ReleaseComObject(_excel);
+                Marshal.ReleaseComObject(_excelApplication);
+
+                _currentWorksheet = null;
+                _excel = null;
+                _excelApplication = null;
+                _currentFileName = null;
+                _currentMode = FileMode.Read;
+
+                GC.Collect();
+            }
+            catch (Exception e)
             {
-                _excelApplication.Workbooks.Close();
-                _excelApplication.Quit();
-                KillExcelProcess(_excelApplication);
+                System.Windows.Forms.MessageBox.Show(e.Message);
             }
-
-            Marshal.ReleaseComObject(_currentWorksheet);
-            Marshal.ReleaseComObject(_excel);
-            Marshal.ReleaseComObject(_excelApplication);
-
-            _currentWorksheet = null;
-            _excel = null;
-            _excelApplication = null;
-            _currentFileName = null;
-
-            GC.Collect();
         }
 
         public static void AddWorksheet()
@@ -199,6 +251,11 @@ namespace CommonLibrary
             _currentWorksheet.Select();
 
             return true;
+        }
+
+        public static Worksheet GetCurrentWorksheet()
+        {
+            return _currentWorksheet;
         }
 
         public static int GetWorksheetCount()
@@ -350,6 +407,21 @@ namespace CommonLibrary
             return _currentWorksheet.Cells[row, column];
         }
 
+        public static dynamic GetCellValue(int row, int column)
+        {
+            if (_currentWorksheet == null)
+            {
+                return null;
+            }
+
+            Range cell = _currentWorksheet.Cells[row, column];
+            if (cell == null)
+            {
+                return -1;
+            }
+            return cell.Value;
+        }
+
         public static void SetColumnWidth(int columnIndex, int width)
         {
             if (_currentWorksheet == null)
@@ -390,6 +462,37 @@ namespace CommonLibrary
             _currentWorksheet.Cells[rowIndex, columnIndex].Interior.Color = ColorTranslator.ToOle(color);
         }
 
+        public static void SetCellHorizontalAlignment(int rowIndex, int columnIndex, Alignment alignment)
+        {
+            if (_currentWorksheet == null)
+            {
+                return;
+            }
+
+            if (alignment == Alignment.Left)
+            {
+                _currentWorksheet.Cells[rowIndex, columnIndex].HorizontalAlignment = XlHAlign.xlHAlignLeft;
+            }
+            else if (alignment == Alignment.Center)
+            {
+                _currentWorksheet.Cells[rowIndex, columnIndex].HorizontalAlignment = XlHAlign.xlHAlignCenter;
+            }
+            else if (alignment == Alignment.Right)
+            {
+                _currentWorksheet.Cells[rowIndex, columnIndex].HorizontalAlignment = XlHAlign.xlHAlignRight;
+            }
+        }
+
+        public static void SetCellFontColor(int rowIndex, int columnIndex, Color color)
+        {
+            if (_currentWorksheet == null)
+            {
+                return;
+            }
+
+            _currentWorksheet.Cells[rowIndex, columnIndex].Font.Color = ColorTranslator.ToOle(color);
+        }
+
         public static void MergeCells(int startRowIndex, int startColumnIndex, int endRowIndex, int endColumnIndex)
         {
             if (_currentWorksheet == null)
@@ -400,7 +503,7 @@ namespace CommonLibrary
             _currentWorksheet.Range[_currentWorksheet.Cells[startRowIndex, startColumnIndex], _currentWorksheet.Cells[endRowIndex, endColumnIndex]].Merge();
         }
 
-        public static bool WriteCell(int row, int column, string data, bool isNumberFormat = false, bool isBold = false)
+        public static bool WriteCell(int row, int column, dynamic data, CellFormat cellFormat = CellFormat.String, bool isBold = false)
         {
             if (_currentWorksheet == null)
             {
@@ -408,18 +511,22 @@ namespace CommonLibrary
             }
 
             Range cell = GetCell(row, column);
-            if (isNumberFormat == true)
+            if (cellFormat == CellFormat.Number)
             {
                 cell.NumberFormat = "0.0";
             }
-            
+            else if (cellFormat == CellFormat.Number)
+            {
+                cell.NumberFormat = "0.0%"; ;
+            }
+
             cell.Value = data;
             cell.Font.Bold = isBold;
 
             return true;
         }
 
-        public static bool WriteCellFormula(int row, int column, string formula, bool isNumberFormat = false, bool isBold = false)
+        public static bool WriteCellFormula(int row, int column, string formula, CellFormat cellFormat = CellFormat.String, bool isBold = false)
         {
             if (_currentWorksheet == null)
             {
@@ -427,9 +534,13 @@ namespace CommonLibrary
             }
 
             Range cell = GetCell(row, column);
-            if (isNumberFormat == true)
+            if (cellFormat == CellFormat.Number)
             {
                 cell.NumberFormat = "0.0";
+            }
+            else if (cellFormat == CellFormat.Percentage)
+            {
+                cell.NumberFormat = "0%"; ;
             }
 
             cell.Formula = formula;
