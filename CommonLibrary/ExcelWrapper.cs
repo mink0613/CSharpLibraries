@@ -246,7 +246,21 @@ namespace CommonLibrary
             _currentWorksheet = _excel.Worksheets[sheetIndex];
             if (sheetName != null)
             {
-                _currentWorksheet.Name = sheetName;
+                bool isStop = false;
+                string tempName = sheetName;
+                int index = 1;
+                while (isStop == false)
+                {
+                    try
+                    {
+                        _currentWorksheet.Name = tempName;
+                        isStop = true;
+                    } catch (Exception e)
+                    {
+                        tempName = sheetName + "_" + index.ToString();
+                        index++;
+                    }
+                }
             }
             _currentWorksheet.Select();
 
