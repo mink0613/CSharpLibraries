@@ -531,7 +531,7 @@ namespace CommonLibrary
             }
             else if (cellFormat == CellFormat.Number)
             {
-                cell.NumberFormat = "0.0%"; ;
+                cell.NumberFormat = "0.0%";
             }
 
             cell.Value = data;
@@ -554,7 +554,7 @@ namespace CommonLibrary
             }
             else if (cellFormat == CellFormat.Percentage)
             {
-                cell.NumberFormat = "0%"; ;
+                cell.NumberFormat = "0%";
             }
 
             cell.Formula = formula;
