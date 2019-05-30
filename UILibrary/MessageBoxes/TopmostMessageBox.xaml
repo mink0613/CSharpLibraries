@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        WindowStartupLocation="CenterScreen"
         mc:Ignorable="d"
         Height="250" Width="400">
     <Grid>
@@ -10,11 +11,13 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="55" />
         </Grid.RowDefinitions>
-        <TextBox Name="Message" Grid.Row="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" AcceptsReturn="True" TextWrapping="Wrap"
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <TextBox Name="Message" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" AcceptsReturn="True" TextWrapping="Wrap"
                  VerticalScrollBarVisibility="Auto" VerticalAlignment="Stretch" VerticalContentAlignment="Center" IsReadOnly="True" FontSize="16"/>
+        </ScrollViewer>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Button Name="Yes" Content="Yes" Width="100" Height="50" FontSize="16" Click="ButtonClick" Margin="0,0,10,0"/>
-            <Button Name="No" Content="No" Width="100" Height="50" FontSize="16" Click="ButtonClick"/>
+            <Button Name="Yes" Content="Yes" Width="100" Height="50" FontSize="16" Click="ButtonClick"/>
+            <Button Name="No" Content="No" Width="100" Height="50" FontSize="16" Click="ButtonClick" Margin="10,0,10,0"/>
             <Button Name="OK" Content="OK" Width="100" Height="50" FontSize="16" Click="ButtonClick"/>
         </StackPanel>
     </Grid>
