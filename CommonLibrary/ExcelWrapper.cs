@@ -529,7 +529,7 @@ namespace CommonLibrary
             {
                 cell.NumberFormat = "0.0";
             }
-            else if (cellFormat == CellFormat.Number)
+            else if (cellFormat == CellFormat.Percentage)
             {
                 cell.NumberFormat = "0.0%";
             }
