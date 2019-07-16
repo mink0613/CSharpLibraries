@@ -104,8 +104,28 @@ namespace CommonLibrary
             {
                 return null;
             }
-
+            
             return _currentWorksheet.Cells.Find(content, LookAt: match) as Range;
+        }
+
+        private static Range Find(string content, Range lastCell, XlLookAt match)
+        {
+            if (_currentWorksheet == null)
+            {
+                return null;
+            }
+            
+            return _currentWorksheet.Cells.Find(content, After: lastCell, LookAt: match) as Range;
+        }
+
+        private static Range FindNext(string content)
+        {
+            if (_currentWorksheet == null)
+            {
+                return null;
+            }
+
+            return _currentWorksheet.Cells.FindNext(content) as Range;
         }
 
         public static Workbook Open(string fileName, FileMode mode = FileMode.Write)
@@ -153,7 +173,7 @@ namespace CommonLibrary
             }
             catch (Exception e)
             {
-                System.Windows.Forms.MessageBox.Show(e.Message);
+                //System.Windows.Forms.MessageBox.Show(e.Message);
                 _excel = null;
                 _currentFileName = null;
                 _currentMode = FileMode.Read;
@@ -217,7 +237,7 @@ namespace CommonLibrary
             }
             catch (Exception e)
             {
-                System.Windows.Forms.MessageBox.Show(e.Message);
+                //System.Windows.Forms.MessageBox.Show(e.Message);
             }
         }
 
@@ -605,6 +625,67 @@ namespace CommonLibrary
             }
 
             return _currentWorksheet.Rows[rowNumber];
+        }
+
+        public static IList<Range> FindRowsByCellContent(string content, bool isWholeMatch = false)
+        {
+            XlLookAt lookAt;
+            if (isWholeMatch == true)
+            {
+                lookAt = XlLookAt.xlWhole;
+            }
+            else
+            {
+                lookAt = XlLookAt.xlPart;
+            }
+
+            List<Range> result = new List<Range>();
+            List<int> foundRow = new List<int>();
+
+            // Find method will return first found row after searching ending row.
+            // So, firstFoundRow is used to detect circular search to terminate while loop
+            int firstFoundRow = -1;
+            // lastSearchedRow is used to detect same row for searched cell.
+            int lastSearchedRow = -1;
+            Range matched = null;
+            do
+            {
+                if (matched == null) // for the first time search
+                {
+                    matched = Find(content, lookAt);
+                }
+                else
+                {
+                    matched = Find(content, matched, lookAt);
+                }
+
+                if (matched != null)
+                {
+                    string address = matched.Address;
+                    int rowNumber = GetRowNumber(address);
+                    if (rowNumber != -1)
+                    {
+                        if (!foundRow.Contains(rowNumber))
+                        {
+                            foundRow.Add(rowNumber);
+                            result.Add((Range)_currentWorksheet.Rows[rowNumber]);
+
+                            if (firstFoundRow == -1)
+                            {
+                                firstFoundRow = rowNumber;
+                            }
+
+                            lastSearchedRow = rowNumber;
+                        }
+                        else if (lastSearchedRow != rowNumber && firstFoundRow == rowNumber)
+                        {
+                            matched = null;
+                        }
+                    }
+                }
+            } while (matched != null);
+
+            return (IList<Range>)result;
         }
 
         public static Range FindColumnByCellContent(string content, bool isWholeMatch = false)
