@@ -647,6 +647,8 @@ namespace CommonLibrary
             int firstFoundRow = -1;
             // lastSearchedRow is used to detect same row for searched cell.
             int lastSearchedRow = -1;
+            int maxRetrySameRow = 4;
+            int retrySameRow = 0;
             Range matched = null;
             do
             {
@@ -680,6 +682,14 @@ namespace CommonLibrary
                         else if (lastSearchedRow != rowNumber && firstFoundRow == rowNumber)
                         {
                             matched = null;
+                        }
+                        else
+                        {
+                            retrySameRow++;
+                            if (retrySameRow == maxRetrySameRow)
+                            {
+                                matched = null;
+                            }
                         }
                     }
                 }
