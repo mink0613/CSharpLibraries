@@ -15,7 +15,7 @@ namespace CommonLibrary
     public class GlobalKeyboardHook
     {
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
+        private static extern IntPtr SetWindowsHookEx(int idHook, GlobalKeyboardHookProc lpfn, IntPtr hMod, uint dwThreadId);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -37,11 +37,11 @@ namespace CommonLibrary
 
         private const int WM_SYSKEYUP = 0x105;
 
-        private LowLevelKeyboardProc _proc;
+        private GlobalKeyboardHookProc _proc;
 
         private IntPtr _hookID = IntPtr.Zero;
 
-        public delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
+        public delegate IntPtr GlobalKeyboardHookProc(int nCode, IntPtr wParam, IntPtr lParam);
 
         public event EventHandler<Key> OnKeyPressed;
 
@@ -62,7 +62,7 @@ namespace CommonLibrary
             UnhookWindowsHookEx(_hookID);
         }
 
-        private IntPtr SetHook(LowLevelKeyboardProc proc)
+        private IntPtr SetHook(GlobalKeyboardHookProc proc)
         {
             using (Process curProcess = Process.GetCurrentProcess())
             using (ProcessModule curModule = curProcess.MainModule)
