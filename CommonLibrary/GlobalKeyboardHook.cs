@@ -73,7 +73,7 @@ namespace CommonLibrary
 
         private IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN)
+            if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
             {
                 int vkCode = Marshal.ReadInt32(lParam);
                 
@@ -82,7 +82,7 @@ namespace CommonLibrary
                     OnKeyPressed.Invoke(this, KeyInterop.KeyFromVirtualKey(vkCode));
                 }
             }
-            else if (nCode >= 0 && wParam == (IntPtr)WM_KEYUP || wParam == (IntPtr)WM_SYSKEYUP)
+            else if (nCode >= 0 && wParam == (IntPtr)WM_KEYUP)
             {
                 int vkCode = Marshal.ReadInt32(lParam);
 
