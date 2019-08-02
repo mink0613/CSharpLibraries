@@ -76,14 +76,20 @@ namespace CommonLibrary
             if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN)
             {
                 int vkCode = Marshal.ReadInt32(lParam);
-
-                OnKeyPressed.Invoke(this, KeyInterop.KeyFromVirtualKey(vkCode));
+                
+                if (OnKeyPressed != null)
+                {
+                    OnKeyPressed.Invoke(this, KeyInterop.KeyFromVirtualKey(vkCode));
+                }
             }
             else if (nCode >= 0 && wParam == (IntPtr)WM_KEYUP || wParam == (IntPtr)WM_SYSKEYUP)
             {
                 int vkCode = Marshal.ReadInt32(lParam);
 
-                OnKeyUnpressed.Invoke(this, KeyInterop.KeyFromVirtualKey(vkCode));
+                if (OnKeyUnpressed != null)
+                {
+                    OnKeyUnpressed.Invoke(this, KeyInterop.KeyFromVirtualKey(vkCode));
+                }
             }
 
             return CallNextHookEx(_hookID, nCode, wParam, lParam);
